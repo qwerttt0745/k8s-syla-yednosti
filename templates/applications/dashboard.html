@@ -1,0 +1,170 @@
+{% extends 'base.html' %}
+{% block title %}Дашборд — Сила Єдності{% endblock %}
+
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <h2 class="fw-bold mb-0"><i class="bi bi-grid-fill me-2 text-warning"></i>Дашборд</h2>
+    <p class="text-muted mb-0 small">Управління заявками на матеріальну допомогу</p>
+  </div>
+  <a href="{% url 'applications:create_request' %}" class="btn btn-warning fw-semibold">
+    <i class="bi bi-plus-circle me-1"></i>Нова заявка
+  </a>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-6 col-md-3">
+    <div class="card border-0 shadow-sm text-center py-3">
+      <div class="h3 fw-bold text-danger mb-0">{{ requests|length }}</div>
+      <div class="small text-muted">Всього заявок</div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="card border-0 shadow-sm text-center py-3">
+      <div class="h3 fw-bold text-danger mb-0">
+        {{ requests|dictsort:"status"|length }}
+      </div>
+      <div class="small text-muted">Нових</div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="card border-0 shadow-sm text-center py-3">
+      <div class="h3 fw-bold text-warning mb-0">—</div>
+      <div class="small text-muted">В обробці</div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="card border-0 shadow-sm text-center py-3">
+      <div class="h3 fw-bold text-success mb-0">—</div>
+      <div class="small text-muted">Виконано</div>
+    </div>
+  </div>
+</div>
+
+<div class="card border-0 shadow-sm mb-4">
+  <div class="card-body py-3">
+    <form method="get" class="row g-2 align-items-end">
+      <div class="col-12 col-sm-6 col-md-3">
+        <label class="form-label small fw-semibold mb-1">Статус</label>
+        <select name="status" class="form-select form-select-sm">
+          <option value="">Всі статуси</option>
+          {% for val, label in statuses %}
+          <option value="{{ val }}" {% if request.GET.status == val %}selected{% endif %}>
+            {{ label }}
+          </option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-12 col-sm-6 col-md-3">
+        <label class="form-label small fw-semibold mb-1">Категорія</label>
+        <select name="category" class="form-select form-select-sm">
+          <option value="">Всі категорії</option>
+          {% for cat in categories %}
+          <option value="{{ cat.slug }}" {% if request.GET.category == cat.slug %}selected{% endif %}>
+            {{ cat.name }}
+          </option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-12 col-sm-6 col-md-3">
+        <label class="form-label small fw-semibold mb-1">Підрозділ</label>
+        <input type="text" name="unit_name" class="form-control form-control-sm"
+               placeholder="72 ОМБр..." value="{{ request.GET.unit_name }}">
+      </div>
+      <div class="col-12 col-sm-6 col-md-3">
+        <label class="form-label small fw-semibold mb-1">Пошук (FR-09)</label>
+        <div class="input-group input-group-sm">
+          <input type="text" name="search" class="form-control"
+                 placeholder="Прізвище або телефон" value="{{ request.GET.search }}">
+          <button class="btn btn-dark" type="submit">
+            <i class="bi bi-search"></i>
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="card border-0 shadow-sm">
+  <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center py-3">
+    <h6 class="mb-0 fw-semibold"><i class="bi bi-table me-2"></i>Реєстр заявок</h6>
+    <span class="badge bg-secondary">{{ requests|length }} записів</span>
+  </div>
+  <div class="card-body p-0">
+    {% if requests %}
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="table-light">
+          <tr>
+            <th class="ps-3" style="width:70px;">ID</th>
+            <th>Дата</th>
+            <th>Заявник / Підрозділ</th>
+            <th>Категорія</th>
+            <th>Терміновість</th>
+            <th>Статус</th>
+            <th>Відповідальний</th>
+            <th class="text-end pe-3">Дії</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for req in requests %}
+          <tr data-href="{% url 'applications:request_detail' req.pk %}">
+            <td class="ps-3 fw-semibold text-muted">#{{ req.pk }}</td>
+            <td class="small text-muted">{{ req.created_at|date:"d.m.Y" }}<br>
+              <span class="text-muted" style="font-size:11px;">{{ req.created_at|date:"H:i" }}</span>
+            </td>
+            <td>
+              <div class="fw-semibold">{{ req.user_name }}</div>
+              <div class="small text-muted">{{ req.unit_name }}</div>
+            </td>
+            <td><span class="badge bg-dark bg-opacity-10 text-dark">{{ req.category.name }}</span></td>
+            <td>
+              {% if req.priority == 'CRITICAL' %}
+                <span class="badge bg-danger"><i class="bi bi-exclamation-triangle-fill me-1"></i>Критичний</span>
+              {% elif req.priority == 'MEDIUM' %}
+                <span class="badge bg-warning text-dark">Середній</span>
+              {% else %}
+                <span class="badge bg-light text-dark border">Низький</span>
+              {% endif %}
+            </td>
+            <td>
+              {% if req.status == 'NEW' %}
+                <span class="badge bg-danger"><i class="bi bi-circle-fill me-1" style="font-size:8px;"></i>Нова</span>
+              {% elif req.status == 'IN_PROGRESS' %}
+                <span class="badge bg-warning text-dark"><i class="bi bi-circle-fill me-1" style="font-size:8px;"></i>В обробці</span>
+              {% elif req.status == 'DONE' %}
+                <span class="badge bg-success"><i class="bi bi-check-circle-fill me-1"></i>Виконано</span>
+              {% else %}
+                <span class="badge bg-secondary">Скасовано</span>
+              {% endif %}
+            </td>
+            <td class="small text-muted">
+              {% if req.assigned_to %}{{ req.assigned_to.email }}{% else %}<span class="text-muted">—</span>{% endif %}
+            </td>
+            <td class="text-end pe-3">
+              <a href="{% url 'applications:request_detail' req.pk %}"
+                 class="btn btn-sm btn-outline-dark">
+                <i class="bi bi-eye me-1"></i>Деталі
+              </a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="text-center py-5 text-muted">
+      <i class="bi bi-inbox" style="font-size:3rem;"></i>
+      <p class="mt-2">Заявок не знайдено</p>
+      {% if request.GET %}
+      <a href="{% url 'applications:dashboard' %}" class="btn btn-sm btn-outline-secondary">
+        Скинути фільтри
+      </a>
+      {% endif %}
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+{% endblock %}

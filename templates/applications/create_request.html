@@ -1,0 +1,140 @@
+{% extends 'base.html' %}
+{% block title %}Подати заявку — Сила Єдності{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-12 col-md-8 col-lg-6">
+
+    <div class="text-center mb-4">
+      <i class="bi bi-shield-fill-check text-warning" style="font-size:2.5rem;"></i>
+      <h1 class="h3 fw-bold mt-2">Сила Єдності</h1>
+      <p class="text-muted mb-0">Заявка на матеріальну допомогу</p>
+    </div>
+
+    <div class="card shadow-sm border-0">
+      <div class="card-header bg-dark text-white py-3">
+        <h5 class="mb-0 fw-semibold">
+          <i class="bi bi-file-earmark-plus me-2"></i>Нова заявка
+        </h5>
+      </div>
+      <div class="card-body p-4">
+        <form method="post" novalidate id="requestForm">
+          {% csrf_token %}
+
+          <h6 class="text-muted text-uppercase small fw-semibold mb-3 mt-1">
+            <i class="bi bi-person me-1"></i>Дані заявника
+          </h6>
+
+          <div class="row g-3 mb-3">
+            <div class="col-12">
+              <label class="form-label fw-semibold">
+                Прізвище та ініціали <span class="text-danger">*</span>
+              </label>
+              {{ form.user_name }}
+              {% if form.user_name.errors %}
+              <div class="invalid-feedback d-block">{{ form.user_name.errors.0 }}</div>
+              {% endif %}
+            </div>
+            <div class="col-12">
+              <label class="form-label fw-semibold">
+                Контактний телефон <span class="text-danger">*</span>
+              </label>
+              {{ form.phone }}
+              <div class="form-text">Формат: +380XXXXXXXXX</div>
+              {% if form.phone.errors %}
+              <div class="invalid-feedback d-block">{{ form.phone.errors.0 }}</div>
+              {% endif %}
+            </div>
+            <div class="col-12">
+              <label class="form-label fw-semibold">
+                Підрозділ <span class="text-danger">*</span>
+              </label>
+              {{ form.unit_name }}
+              <div class="form-text">Наприклад: 72 ОМБр, 2 батальйон</div>
+              {% if form.unit_name.errors %}
+              <div class="invalid-feedback d-block">{{ form.unit_name.errors.0 }}</div>
+              {% endif %}
+            </div>
+          </div>
+
+          <hr class="my-3">
+
+          <h6 class="text-muted text-uppercase small fw-semibold mb-3">
+            <i class="bi bi-box-seam me-1"></i>Що потрібно
+          </h6>
+
+          <div class="row g-3 mb-3">
+            <div class="col-12 col-sm-6">
+              <label class="form-label fw-semibold">
+                Категорія <span class="text-danger">*</span>
+              </label>
+              {{ form.category }}
+              {% if form.category.errors %}
+              <div class="invalid-feedback d-block">{{ form.category.errors.0 }}</div>
+              {% endif %}
+            </div>
+            <div class="col-12 col-sm-6">
+              <label class="form-label fw-semibold">Терміновість</label>
+              {{ form.priority }}
+            </div>
+            <div class="col-12">
+              <label class="form-label fw-semibold">
+                Опис потреби <span class="text-danger">*</span>
+              </label>
+              {{ form.item_name }}
+              <div class="form-text">Вкажіть модель, тип, характеристики</div>
+              {% if form.item_name.errors %}
+              <div class="invalid-feedback d-block">{{ form.item_name.errors.0 }}</div>
+              {% endif %}
+            </div>
+            <div class="col-12 col-sm-4">
+              <label class="form-label fw-semibold">
+                Кількість <span class="text-danger">*</span>
+              </label>
+              {{ form.quantity }}
+              {% if form.quantity.errors %}
+              <div class="invalid-feedback d-block">{{ form.quantity.errors.0 }}</div>
+              {% endif %}
+            </div>
+          </div>
+
+          <hr class="my-3">
+
+          <h6 class="text-muted text-uppercase small fw-semibold mb-3">
+            <i class="bi bi-truck me-1"></i>Адреса доставки (Нова Пошта)
+          </h6>
+
+          <div class="row g-3 mb-4">
+            <div class="col-12 col-sm-7">
+              <label class="form-label fw-semibold">
+                Населений пункт <span class="text-danger">*</span>
+              </label>
+              {{ form.location }}
+              {% if form.location.errors %}
+              <div class="invalid-feedback d-block">{{ form.location.errors.0 }}</div>
+              {% endif %}
+            </div>
+            <div class="col-12 col-sm-5">
+              <label class="form-label fw-semibold">
+                № відділення НП <span class="text-danger">*</span>
+              </label>
+              {{ form.post_dept }}
+              {% if form.post_dept.errors %}
+              <div class="invalid-feedback d-block">{{ form.post_dept.errors.0 }}</div>
+              {% endif %}
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-warning btn-lg w-100 fw-bold py-3" id="submitBtn">
+            <i class="bi bi-send-fill me-2"></i>Надіслати заявку
+          </button>
+          <p class="text-center text-muted small mt-2 mb-0">
+            <i class="bi bi-lock-fill me-1"></i>Дані захищені та передаються волонтерам
+          </p>
+        </form>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

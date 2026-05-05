@@ -1,0 +1,170 @@
+{% extends 'base.html' %}
+{% block title %}Заявка #{{ req.pk }} — Сила Єдності{% endblock %}
+
+{% block content %}
+
+<nav aria-label="breadcrumb" class="mb-3">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="{% url 'applications:dashboard' %}">Дашборд</a></li>
+    <li class="breadcrumb-item active">Заявка #{{ req.pk }}</li>
+  </ol>
+</nav>
+
+<div class="row g-4">
+
+  <div class="col-12 col-lg-8">
+    <div class="card border-0 shadow-sm mb-4">
+      <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center py-3">
+        <h5 class="mb-0 fw-semibold">
+          <i class="bi bi-file-earmark-text me-2"></i>Заявка #{{ req.pk }}
+        </h5>
+        {% if req.status == 'NEW' %}
+          <span class="badge bg-danger fs-6">Нова</span>
+        {% elif req.status == 'IN_PROGRESS' %}
+          <span class="badge bg-warning text-dark fs-6">В обробці</span>
+        {% elif req.status == 'DONE' %}
+          <span class="badge bg-success fs-6">Виконано</span>
+        {% else %}
+          <span class="badge bg-secondary fs-6">Скасовано</span>
+        {% endif %}
+      </div>
+      <div class="card-body p-4">
+        <div class="row g-3">
+          <div class="col-sm-6">
+            <div class="text-muted small fw-semibold text-uppercase">Заявник</div>
+            <div class="fw-semibold">{{ req.user_name }}</div>
+          </div>
+          <div class="col-sm-6">
+            <div class="text-muted small fw-semibold text-uppercase">Телефон</div>
+            <div><a href="tel:{{ req.phone }}">{{ req.phone }}</a></div>
+          </div>
+          <div class="col-sm-6">
+            <div class="text-muted small fw-semibold text-uppercase">Підрозділ</div>
+            <div>{{ req.unit_name }}</div>
+          </div>
+          <div class="col-sm-6">
+            <div class="text-muted small fw-semibold text-uppercase">Категорія</div>
+            <div>{{ req.category.name }}</div>
+          </div>
+          <div class="col-12">
+            <div class="text-muted small fw-semibold text-uppercase">Що потрібно</div>
+            <div class="border rounded p-3 bg-light mt-1">{{ req.item_name }}</div>
+          </div>
+          <div class="col-sm-4">
+            <div class="text-muted small fw-semibold text-uppercase">Кількість</div>
+            <div class="fw-bold fs-5">{{ req.quantity }}</div>
+          </div>
+          <div class="col-sm-4">
+            <div class="text-muted small fw-semibold text-uppercase">Терміновість</div>
+            <div>{{ req.get_priority_display }}</div>
+          </div>
+          <div class="col-sm-4">
+            <div class="text-muted small fw-semibold text-uppercase">Дата подачі</div>
+            <div>{{ req.created_at|date:"d.m.Y H:i" }}</div>
+          </div>
+          <div class="col-sm-6">
+            <div class="text-muted small fw-semibold text-uppercase">Місто</div>
+            <div>{{ req.location }}</div>
+          </div>
+          <div class="col-sm-6">
+            <div class="text-muted small fw-semibold text-uppercase">Відділення НП</div>
+            <div>№{{ req.post_dept }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-light py-3">
+        <h6 class="mb-0 fw-semibold">
+          <i class="bi bi-chat-left-text me-2"></i>Внутрішні нотатки
+          <span class="badge bg-secondary ms-1">{{ req.comments.count }}</span>
+        </h6>
+      </div>
+      <div class="card-body p-4">
+        {% for comment in req.comments.all %}
+        <div class="d-flex gap-3 mb-3">
+          <div class="rounded-circle bg-dark text-white d-flex align-items-center justify-content-center flex-shrink-0"
+               style="width:36px;height:36px;font-size:14px;">
+            {{ comment.author.email|slice:":1"|upper }}
+          </div>
+          <div class="flex-grow-1">
+            <div class="d-flex justify-content-between">
+              <span class="fw-semibold small">{{ comment.author.email }}</span>
+              <span class="text-muted small">{{ comment.created_at|date:"d.m.Y H:i" }}</span>
+            </div>
+            <div class="mt-1 text-break">{{ comment.text }}</div>
+          </div>
+        </div>
+        {% empty %}
+        <p class="text-muted small mb-3">Нотаток поки немає</p>
+        {% endfor %}
+
+        <form method="post" class="mt-3">
+          {% csrf_token %}
+          {{ comment_form.text }}
+          <button type="submit" class="btn btn-sm btn-dark mt-2">
+            <i class="bi bi-send me-1"></i>Додати нотатку
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-12 col-lg-4">
+
+    {% if allowed_transitions %}
+    <div class="card border-0 shadow-sm mb-4">
+      <div class="card-header bg-dark text-white py-3">
+        <h6 class="mb-0 fw-semibold"><i class="bi bi-arrow-right-circle me-2"></i>Змінити статус</h6>
+      </div>
+      <div class="card-body p-3 d-grid gap-2">
+        {% for status in allowed_transitions %}
+        <form method="post">
+          {% csrf_token %}
+          <input type="hidden" name="new_status" value="{{ status }}">
+          {% if status == 'IN_PROGRESS' %}
+          <button type="submit" class="btn btn-warning w-100 fw-semibold">
+            <i class="bi bi-play-fill me-1"></i>Взяти в роботу
+          </button>
+          {% elif status == 'DONE' %}
+          <button type="submit" class="btn btn-success w-100 fw-semibold">
+            <i class="bi bi-check-lg me-1"></i>Позначити виконаною
+          </button>
+          {% elif status == 'CANCELED' %}
+          <button type="submit" class="btn btn-outline-danger w-100"
+                  onclick="return confirm('Скасувати цю заявку?')">
+            <i class="bi bi-x-circle me-1"></i>Скасувати
+          </button>
+          {% endif %}
+        </form>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-light py-3">
+        <h6 class="mb-0 fw-semibold"><i class="bi bi-clock-history me-2"></i>Журнал змін</h6>
+      </div>
+      <div class="card-body p-3">
+        {% for log in audit_logs %}
+        <div class="d-flex gap-2 align-items-start mb-2">
+          <i class="bi bi-arrow-right-circle text-muted mt-1"></i>
+          <div class="small">
+            <span class="text-muted">{{ log.changed_at|date:"d.m H:i" }}</span>
+            <span class="fw-semibold ms-1">{{ log.old_status }} → {{ log.new_status }}</span>
+            {% if log.changed_by %}
+            <div class="text-muted">{{ log.changed_by.email }}</div>
+            {% endif %}
+          </div>
+        </div>
+        {% empty %}
+        <p class="text-muted small mb-0">Змін ще не було</p>
+        {% endfor %}
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,52 @@
+/* Сила Єдності — кастомні стилі */
+
+body {
+  background-color: #f8f9fa;
+  font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+}
+
+.navbar-brand {
+  letter-spacing: 0.5px;
+}
+
+.card {
+  border-radius: 12px;
+}
+
+.table th {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #6c757d;
+  font-weight: 600;
+}
+
+.table tbody tr:hover {
+  background-color: #fff8e7;
+  cursor: pointer;
+}
+
+.badge {
+  font-size: 0.75rem;
+  padding: 0.4em 0.7em;
+}
+
+#submitBtn {
+  font-size: 1.1rem;
+  letter-spacing: 0.3px;
+}
+
+@media (max-width: 576px) {
+  .container { padding-left: 12px; padding-right: 12px; }
+  .card-body { padding: 1.25rem !important; }
+  .btn-lg { font-size: 1.05rem; }
+}
+
+.nav-link.active {
+  font-weight: 600;
+  color: #ffc107 !important;
+}
+
+.card-header h5, .card-header h6 {
+  font-size: 0.95rem;
+}

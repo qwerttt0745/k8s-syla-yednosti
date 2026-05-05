@@ -1,0 +1,9 @@
+[
+  {"model": "applications.category", "pk": 1, "fields": {"name": "Дрони та БПЛА",         "slug": "drones"}},
+  {"model": "applications.category", "pk": 2, "fields": {"name": "Тактична медицина",     "slug": "medicine"}},
+  {"model": "applications.category", "pk": 3, "fields": {"name": "Засоби зв'язку",        "slug": "communication"}},
+  {"model": "applications.category", "pk": 4, "fields": {"name": "Амуніція та оптика",    "slug": "ammo"}},
+  {"model": "applications.category", "pk": 5, "fields": {"name": "Енергонезалежність",    "slug": "energy"}},
+  {"model": "applications.category", "pk": 6, "fields": {"name": "Автотехніка",           "slug": "vehicles"}},
+  {"model": "applications.category", "pk": 7, "fields": {"name": "Інше",                  "slug": "other"}}
+]
