@@ -1,5 +1,6 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.db.models import Count, Q
 from django.shortcuts import get_object_or_404, redirect, render
 
 from .forms import CommentForm, RequestForm
@@ -32,10 +33,21 @@ def dashboard(request):
     )
     categories = Category.objects.all().order_by("name")
     statuses = Request.Status.choices
+    counts = Request.objects.aggregate(
+        total=Count("id"),
+        new=Count("id", filter=Q(status="NEW")),
+        in_progress=Count("id", filter=Q(status="IN_PROGRESS")),
+        done=Count("id", filter=Q(status="DONE")),
+    )
     return render(
         request,
         "applications/dashboard.html",
-        {"requests": queryset, "categories": categories, "statuses": statuses},
+        {
+            "requests": queryset,
+            "categories": categories,
+            "statuses": statuses,
+            "counts": counts,
+        },
     )
 
 
@@ -44,12 +56,13 @@ def request_detail(request, pk: int):
     req = get_object_or_404(Request.objects.select_related("category", "assigned_to"), pk=pk)
     comment_form = CommentForm(request.POST or None)
 
-    if request.method == "POST" and request.POST.get("new_status"):
-        try:
-            StatusService.update_status(req, request.POST["new_status"], user=request.user)
-            messages.success(request, "Статус оновлено")
-        except Exception as exc:
-            messages.error(request, str(exc))
+    if "new_status" in request.POST:
+        new_status = request.POST["new_status"]
+        req._changed_by = request.user
+        if StatusService.transition(req, new_status, request.user):
+            messages.success(request, "Статус змінено")
+        else:
+            messages.error(request, "Недозволений перехід статусу")
         return redirect("applications:request_detail", pk=req.pk)
 
     if request.method == "POST" and comment_form.is_valid():

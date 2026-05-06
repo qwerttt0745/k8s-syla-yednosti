@@ -5,6 +5,8 @@ ENV PYTHONUNBUFFERED=1
 
 WORKDIR /app
 
+RUN mkdir -p /app/media /app/staticfiles
+
 # System dependencies
 RUN apt-get update && apt-get install -y \
     libpq-dev \

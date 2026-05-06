@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+{% block title %}Внести дані закупівлі — Сила Єдності{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb" class="mb-3">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="{% url 'applications:dashboard' %}">Дашборд</a></li>
+    <li class="breadcrumb-item"><a href="{% url 'applications:request_detail' req.pk %}">Заявка #{{ req.pk }}</a></li>
+    <li class="breadcrumb-item active">Дані закупівлі</li>
+  </ol>
+</nav>
+
+<div class="row justify-content-center">
+  <div class="col-12 col-md-7 col-lg-6">
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-success text-white py-3">
+        <h5 class="mb-0 fw-semibold">
+          <i class="bi bi-receipt me-2"></i>Внести дані закупівлі
+        </h5>
+      </div>
+      <div class="card-body p-4">
+
+        <div class="alert alert-light border mb-4">
+          <div class="small text-muted fw-semibold text-uppercase mb-1">Заявка #{{ req.pk }}</div>
+          <div class="fw-semibold">{{ req.unit_name }}</div>
+          <div class="text-muted">{{ req.item_name|truncatechars:100 }} — {{ req.quantity }} шт.</div>
+        </div>
+
+        <form method="post" enctype="multipart/form-data" novalidate>
+          {% csrf_token %}
+
+          <div class="mb-3">
+            <label class="form-label fw-semibold">
+              Фактична вартість (грн) <span class="text-danger">*</span>
+            </label>
+            {{ form.actual_cost }}
+            {% if form.actual_cost.errors %}
+            <div class="invalid-feedback d-block">{{ form.actual_cost.errors.0 }}</div>
+            {% endif %}
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-semibold">
+              Дата чеку <span class="text-danger">*</span>
+            </label>
+            {{ form.purchase_date }}
+            {% if form.purchase_date.errors %}
+            <div class="invalid-feedback d-block">{{ form.purchase_date.errors.0 }}</div>
+            {% endif %}
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-semibold">
+              Джерело фінансування <span class="text-danger">*</span>
+            </label>
+            {{ form.funding_source }}
+            <div class="form-text">Наприклад: «Загальний збір», «Цільовий донат від Петренко»</div>
+            {% if form.funding_source.errors %}
+            <div class="invalid-feedback d-block">{{ form.funding_source.errors.0 }}</div>
+            {% endif %}
+          </div>
+
+          <div class="mb-4">
+            <label class="form-label fw-semibold">
+              Фото чеку <span class="text-danger">*</span>
+            </label>
+            {{ form.receipt_photo }}
+            <div class="form-text">Завантаж фото або скан чека (jpg, png, pdf)</div>
+            {% if form.receipt_photo.errors %}
+            <div class="invalid-feedback d-block">{{ form.receipt_photo.errors.0 }}</div>
+            {% endif %}
+          </div>
+
+          <div class="alert alert-warning py-2 small mb-4">
+            <i class="bi bi-info-circle me-1"></i>
+            Після збереження заявка автоматично отримає статус <strong>«Виконано»</strong>.
+          </div>
+
+          <div class="d-grid gap-2">
+            <button type="submit" class="btn btn-success fw-semibold py-2">
+              <i class="bi bi-check-circle me-2"></i>Зберегти та закрити заявку
+            </button>
+            <a href="{% url 'applications:request_detail' req.pk %}" class="btn btn-outline-secondary">
+              Скасувати
+            </a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

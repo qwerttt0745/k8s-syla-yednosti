@@ -16,27 +16,25 @@
 <div class="row g-3 mb-4">
   <div class="col-6 col-md-3">
     <div class="card border-0 shadow-sm text-center py-3">
-      <div class="h3 fw-bold text-danger mb-0">{{ requests|length }}</div>
+      <div class="h3 fw-bold text-dark mb-0">{{ counts.total }}</div>
       <div class="small text-muted">Всього заявок</div>
     </div>
   </div>
   <div class="col-6 col-md-3">
     <div class="card border-0 shadow-sm text-center py-3">
-      <div class="h3 fw-bold text-danger mb-0">
-        {{ requests|dictsort:"status"|length }}
-      </div>
+      <div class="h3 fw-bold text-danger mb-0">{{ counts.new }}</div>
       <div class="small text-muted">Нових</div>
     </div>
   </div>
   <div class="col-6 col-md-3">
     <div class="card border-0 shadow-sm text-center py-3">
-      <div class="h3 fw-bold text-warning mb-0">—</div>
+      <div class="h3 fw-bold text-warning mb-0">{{ counts.in_progress }}</div>
       <div class="small text-muted">В обробці</div>
     </div>
   </div>
   <div class="col-6 col-md-3">
     <div class="card border-0 shadow-sm text-center py-3">
-      <div class="h3 fw-bold text-success mb-0">—</div>
+      <div class="h3 fw-bold text-success mb-0">{{ counts.done }}</div>
       <div class="small text-muted">Виконано</div>
     </div>
   </div>
@@ -139,8 +137,20 @@
                 <span class="badge bg-secondary">Скасовано</span>
               {% endif %}
             </td>
-            <td class="small text-muted">
-              {% if req.assigned_to %}{{ req.assigned_to.email }}{% else %}<span class="text-muted">—</span>{% endif %}
+            <td>
+              {% if req.assigned_to %}
+                <div class="d-flex align-items-center gap-2">
+                  <div class="rounded-circle bg-dark text-white d-flex align-items-center justify-content-center flex-shrink-0"
+                       style="width:28px;height:28px;font-size:11px;font-weight:600;">
+                    {{ req.assigned_to.email|slice:":1"|upper }}
+                  </div>
+                  <span class="small text-truncate" style="max-width:120px;" title="{{ req.assigned_to.email }}">
+                    {{ req.assigned_to.email|truncatechars:18 }}
+                  </span>
+                </div>
+              {% else %}
+                <span class="text-muted">—</span>
+              {% endif %}
             </td>
             <td class="text-end pe-3">
               <a href="{% url 'applications:request_detail' req.pk %}"

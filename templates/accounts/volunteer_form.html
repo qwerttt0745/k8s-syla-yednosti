@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+{% block title %}Додати волонтера — Сила Єдності{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-12 col-md-6 col-lg-5">
+
+    <nav aria-label="breadcrumb" class="mb-3">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'applications:dashboard' %}">Дашборд</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'accounts:volunteer_list' %}">Волонтери</a></li>
+        <li class="breadcrumb-item active">Додати</li>
+      </ol>
+    </nav>
+
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-dark text-white py-3">
+        <h5 class="mb-0 fw-semibold">
+          <i class="bi bi-person-plus me-2"></i>{{ action }} користувача
+        </h5>
+      </div>
+      <div class="card-body p-4">
+        <form method="post" novalidate>
+          {% csrf_token %}
+
+          {% if form.non_field_errors %}
+          <div class="alert alert-danger py-2 mb-3">
+            {{ form.non_field_errors.0 }}
+          </div>
+          {% endif %}
+
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Email <span class="text-danger">*</span></label>
+            {{ form.email }}
+            {% if form.email.errors %}
+            <div class="invalid-feedback d-block">{{ form.email.errors.0 }}</div>
+            {% endif %}
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Роль <span class="text-danger">*</span></label>
+            {{ form.role }}
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Пароль <span class="text-danger">*</span></label>
+            {{ form.password }}
+            {% if form.password.errors %}
+            <div class="invalid-feedback d-block">{{ form.password.errors.0 }}</div>
+            {% endif %}
+          </div>
+
+          <div class="mb-4">
+            <label class="form-label fw-semibold">Підтвердження пароля <span class="text-danger">*</span></label>
+            {{ form.password_confirm }}
+          </div>
+
+          <div class="d-grid gap-2">
+            <button type="submit" class="btn btn-warning fw-semibold py-2">
+              <i class="bi bi-person-check me-2"></i>Створити обліковий запис
+            </button>
+            <a href="{% url 'accounts:volunteer_list' %}" class="btn btn-outline-secondary">
+              Скасувати
+            </a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
