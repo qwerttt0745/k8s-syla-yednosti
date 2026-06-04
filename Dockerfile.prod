@@ -14,6 +14,8 @@ RUN pip install --no-cache-dir -r requirements/production.txt
 
 COPY . .
 
+RUN mkdir -p /app/static /app/staticfiles /app/media
+
 # Збираємо статику під час збірки образу
 RUN python manage.py collectstatic --noinput \
     --settings=config.settings.production || true

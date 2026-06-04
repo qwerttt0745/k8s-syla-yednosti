@@ -12,6 +12,10 @@ spec:
     metadata:
       labels:
         app: django
+      annotations:                              
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8000"
+        prometheus.io/path: "/-/metrics"
     spec:
       initContainers:
         # initContainer запускається ПЕРЕД основним контейнером
