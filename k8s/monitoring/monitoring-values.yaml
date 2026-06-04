@@ -1,0 +1,43 @@
+# monitoring-values.yaml
+prometheus:
+  prometheusSpec:
+    retention: 30d
+    storageSpec:
+      volumeClaimTemplate:
+        spec:
+          accessModes: [ReadWriteOnce]
+          resources:
+            requests:
+              storage: 2Gi
+          selector:
+            matchLabels:
+              app: prometheus-pv
+    nodeSelector:
+      kubernetes.io/hostname: worker-1
+
+grafana:
+  adminPassword: "grafana123"
+  persistence:
+    enabled: true
+    size: 1Gi
+    selector:
+      matchLabels:
+        app: grafana-pv
+  nodeSelector:
+    kubernetes.io/hostname: worker-2
+  service:
+    type: NodePort
+    nodePort: 32600
+
+alertmanager:
+  alertmanagerSpec:
+    nodeSelector:
+      kubernetes.io/hostname: worker-1
+
+# node-exporter автоматично ставиться DaemonSet на всі ноди
+nodeExporter:
+  enabled: true
+
+# kube-state-metrics — стан об'єктів кластера
+kubeStateMetrics:
+  enabled: true
