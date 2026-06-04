@@ -1,0 +1,20 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: django-ingress
+  namespace: syla-yednosti
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-body-size: "10m"   # для файлів media
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: syla-yednosti.local     # або IP ноди
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: django-service
+                port:
+                  number: 80
