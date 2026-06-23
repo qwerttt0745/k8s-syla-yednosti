@@ -1,0 +1,29 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: postgres-backup
+  namespace: syla
+spec:
+  schedule: "0 2 * * *"    
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: Never
+          containers:
+            - name: backup
+              image: postgres:16-alpine
+              command:
+                - /bin/sh
+                - -c
+                - pg_dump -U postgres -h postgres syla_yednosti > /backups/backup_$(date +%Y%m%d_%H%M%S).sql
+              envFrom:
+                - secretRef:
+                    name: syla-secrets
+              volumeMounts:
+                - name: backup-storage
+                  mountPath: /backups
+          volumes:
+            - name: backup-storage
+              persistentVolumeClaim:
+                claimName: backup-pvc
