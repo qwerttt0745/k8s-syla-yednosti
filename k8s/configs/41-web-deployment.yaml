@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web
+  namespace: syla
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: web
+  template:
+    metadata:
+      labels:
+        app: web
+    spec:
+      containers:
+        - name: web
+          image: docker.io/qwert7750/syla:v3
+          ports:
+            - containerPort: 8000
+          envFrom:
+            - configMapRef:
+                name: syla-config
+            - secretRef:
+                name: syla-secrets
+          volumeMounts:
+            - name: media-storage
+              mountPath: /app/media
+          readinessProbe:
+            httpGet:
+              path: /           
+              port: 8000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+      volumes:
+        - name: media-storage
+          persistentVolumeClaim:
+            claimName: media-pvc

@@ -7,11 +7,22 @@ WORKDIR /app
 
 RUN mkdir -p /app/media /app/staticfiles
 
-# Python dependencies
+# Встановлюємо production-залежності (gunicorn, whitenoise)
 COPY requirements/base.txt requirements/base.txt
-COPY requirements/local.txt requirements/local.txt
-RUN pip install --no-cache-dir -r requirements/local.txt
+COPY requirements/production.txt requirements/production.txt
+RUN pip install --no-cache-dir -r requirements/production.txt
 
 COPY . .
 
+RUN mkdir -p /app/static /app/staticfiles /app/media
+
+# Збираємо статику під час збірки образу
+RUN python manage.py collectstatic --noinput \
+    --settings=config.settings.production || true
+
 EXPOSE 8000
+
+# Запускаємо через gunicorn (не runserver — він не для продакшену!)
+CMD ["gunicorn", "config.wsgi:application", \
+     "--bind", "0.0.0.0:8000", \
+     "--workers", "2"]

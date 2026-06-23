@@ -29,11 +29,5 @@ staticfiles/
 # macOS
 .DS_Store
 
-# Terraform
-terraform/.terraform/
-terraform/*.tfstate
-terraform/*.tfstate.backup
-terraform/.terraform.lock.hcl
-
 #kubernetes
-01-secret.yaml
+02-secret.yaml

@@ -2,17 +2,18 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: django-migrate
-  namespace: syla-yednosti
+  namespace: syla
 spec:
+  backoffLimit: 3 
   template:
     spec:
-      restartPolicy: OnFailure
+      restartPolicy: Never
       containers:
         - name: migrate
-          image: 192.168.10.10:5000/syla-yednosti:v1
+          image: docker.io/qwert7750/syla:v3
           command: ["python", "manage.py", "migrate", "--noinput"]
           envFrom:
-            - secretRef:
-                name: django-secret
             - configMapRef:
-                name: django-config
+                name: syla-config
+            - secretRef:
+                name: syla-secrets

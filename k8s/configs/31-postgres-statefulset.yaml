@@ -1,22 +1,10 @@
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: postgres-pvc
-  namespace: syla-yednosti
-spec:
-  accessModes:
-    - ReadWriteOnce          # Один вузол читає/пише
-  resources:
-    requests:
-      storage: 5Gi
----
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: postgres
-  namespace: syla-yednosti
+  namespace: syla
 spec:
-  serviceName: "postgres-service"
+  serviceName: postgres          
   replicas: 1
   selector:
     matchLabels:
@@ -32,41 +20,36 @@ spec:
           ports:
             - containerPort: 5432
           envFrom:
+            - configMapRef:
+                name: syla-config
             - secretRef:
-                name: django-secret   # DB_USER, DB_PASSWORD, DB_NAME
+                name: syla-secrets
           env:
             - name: POSTGRES_DB
               valueFrom:
-                secretKeyRef:
-                  name: django-secret
+                configMapKeyRef:
+                  name: syla-config
                   key: DB_NAME
             - name: POSTGRES_USER
               valueFrom:
                 secretKeyRef:
-                  name: django-secret
+                  name: syla-secrets
                   key: DB_USER
             - name: POSTGRES_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: django-secret
+                  name: syla-secrets
                   key: DB_PASSWORD
           volumeMounts:
             - name: postgres-storage
               mountPath: /var/lib/postgresql/data
+              subPath: pgdata     
+          readinessProbe:
+            exec:
+              command: ["pg_isready", "-U", "postgres"]
+            initialDelaySeconds: 5
+            periodSeconds: 10
       volumes:
         - name: postgres-storage
           persistentVolumeClaim:
             claimName: postgres-pvc
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: postgres-service
-  namespace: syla-yednosti
-spec:
-  selector:
-    app: postgres
-  ports:
-    - port: 5432
-      targetPort: 5432
-  clusterIP: None   # Headless service для StatefulSet
